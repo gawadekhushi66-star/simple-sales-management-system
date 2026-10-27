@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Login{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5"><div class="col-md-5">
+<div class="card shadow-sm"><div class="card-body p-4">
+<h2 class="mb-3">Admin Login</h2><p class="text-muted">Sign in to manage products and sales.</p>
+<form method="post">
+<label class="form-label">Username</label><input class="form-control mb-3" name="username" required>
+<label class="form-label">Password</label><input class="form-control mb-3" type="password" name="password" required>
+<button class="btn btn-primary w-100">Login</button>
+</form>
+<div class="small text-muted mt-3">Demo: <b>admin</b> / <b>admin123</b></div>
+</div></div></div></div>
+{% endblock %}

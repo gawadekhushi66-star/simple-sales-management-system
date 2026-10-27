@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Sales Management{% endblock %} | SalesDesk</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+{% if session.get('user_id') %}<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark"><i class="bi bi-cart3"></i></span><span>Sales<span class="brand-light">Desk</span></span></a>
+    <div class="side-label">WORKSPACE</div>
+    <nav class="side-nav">
+      <a class="side-link {% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><i class="bi bi-grid-1x2-fill"></i>Dashboard</a>
+      <a class="side-link {% if request.endpoint == 'products' %}active{% endif %}" href="{{ url_for('products') }}"><i class="bi bi-box-seam"></i>Products</a>
+      <a class="side-link {% if request.endpoint == 'customers' %}active{% endif %}" href="{{ url_for('customers') }}"><i class="bi bi-people"></i>Customers</a>
+      <a class="side-link {% if request.endpoint == 'sales' %}active{% endif %}" href="{{ url_for('sales') }}"><i class="bi bi-receipt"></i>New sale</a>
+      <a class="side-link {% if request.endpoint == 'sales_history' %}active{% endif %}" href="{{ url_for('sales_history') }}"><i class="bi bi-clock-history"></i>Sales history</a>
+      <a class="side-link {% if request.endpoint in ['reports','report_chart','export_report'] %}active{% endif %}" href="{{ url_for('reports') }}"><i class="bi bi-bar-chart-line"></i>Reports & analytics</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="help-mini"><i class="bi bi-lightbulb"></i><strong>Quick tip</strong><span>Keep your stock updated to avoid missed sales.</span></div><a class="side-link logout-link" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i>Log out</a></div>
+  </aside>
+  <div class="main-area"><header class="topbar"><button class="menu-toggle" id="menuToggle" aria-label="Toggle menu"><i class="bi bi-list"></i></button><div class="top-search"><i class="bi bi-search"></i><input id="globalSearch" type="search" placeholder="Search this page..." aria-label="Search this page"></div><div class="top-user"><span class="avatar">{{ session.get('username','A')[:1]|upper }}</span><span class="user-name">{{ session.get('username','Admin') }}</span><i class="bi bi-chevron-down small"></i></div></header>
+{% else %}<div class="public-area">
+{% endif %}
+    <main class="{% if session.get('user_id') %}page-content{% else %}container py-4{% endif %}">
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}{% endif %}{% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+{% if session.get('user_id') %}<footer class="app-footer">SalesDesk · Simple Sales Management System <span>Built with Flask & MySQL</span></footer></div></div>{% else %}</div>{% endif %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  const menuToggle = document.getElementById('menuToggle');
+  if (menuToggle) menuToggle.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('sidebar-open'));
+  const globalSearch = document.getElementById('globalSearch');
+  if (globalSearch) globalSearch.addEventListener('input', () => {
+    const query = globalSearch.value.toLowerCase().trim();
+    document.querySelectorAll('table tbody tr').forEach(row => { row.hidden = !row.innerText.toLowerCase().includes(query); });
+  });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

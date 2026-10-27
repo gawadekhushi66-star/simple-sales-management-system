@@ -1,0 +1,75 @@
+
+{% extends "base.html" %}
+
+{% block title %}Customers{% endblock %}
+
+{% block content %}
+<h1>Customer Management</h1>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Add Customer</h5>
+
+                <form method="post">
+                    <label class="form-label">Name *</label>
+                    <input class="form-control mb-2" name="name" required>
+
+                    <label class="form-label">Phone</label>
+                    <input class="form-control mb-2" name="phone">
+
+                    <label class="form-label">Email</label>
+                    <input class="form-control mb-3"
+                           type="email" name="email">
+
+                    <button class="btn btn-primary" type="submit">
+                        Add Customer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Customers List</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for c in customers %}
+                            <tr>
+                                <td>{{ c.name }}</td>
+                                <td>{{ c.phone }}</td>
+                                <td>{{ c.email }}</td>
+                                <td>
+                                    <a href="{{ url_for('edit_customer', customer_id=c.id) }}"
+                                       class="btn btn-sm btn-warning">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4">No customers added yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

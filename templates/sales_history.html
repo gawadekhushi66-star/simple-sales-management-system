@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block title %}Sales History{% endblock %}
+{% block content %}<h1>Sales History</h1><div class="card shadow-sm"><div class="card-body"><div class="table-responsive"><table class="table table-striped">
+<thead><tr><th>Sale ID</th><th>Date</th><th>Customer</th><th>Total</th></tr></thead><tbody>
+{% for s in sales %}<tr><td>#{{ s.id }}</td><td>{{ s.sale_date }}</td><td>{{ s.customer }}</td><td>₹{{ '%.2f'|format(s.total_amount) }}</td></tr>{% else %}<tr><td colspan="4">No sales recorded yet.</td></tr>{% endfor %}
+</tbody></table></div><a class="btn btn-primary" href="{{ url_for('sales') }}">Record New Sale</a></div></div>{% endblock %}

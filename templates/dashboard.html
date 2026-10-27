@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="welcome-row">
+  <div><div class="eyebrow">OVERVIEW</div><h1>Dashboard <span class="live-dot"></span></h1><p>Welcome back, {{ session.get('username') }}! Here's your shop at a glance.</p></div>
+  <div class="today-pill"><i class="bi bi-calendar3"></i><span id="todayDate">Today</span></div>
+</div>
+<div class="stats-grid">
+  <a class="stat-card stat-blue" href="{{ url_for('sales_history') }}"><div class="stat-top"><span>Total sales</span><span class="stat-icon"><i class="bi bi-currency-rupee"></i></span></div><div class="stat-value">₹{{ '{:,.2f}'.format(total_sales|float) }}</div><div class="stat-foot"><span class="stat-note">All recorded transactions</span><i class="bi bi-arrow-up-right"></i></div></a>
+  <a class="stat-card stat-green" href="{{ url_for('products') }}"><div class="stat-top"><span>Total products</span><span class="stat-icon"><i class="bi bi-box-seam"></i></span></div><div class="stat-value">{{ product_count }}</div><div class="stat-foot"><span class="stat-note">Products in catalogue</span><i class="bi bi-arrow-up-right"></i></div></a>
+  <a class="stat-card stat-purple" href="{{ url_for('customers') }}"><div class="stat-top"><span>Total customers</span><span class="stat-icon"><i class="bi bi-people"></i></span></div><div class="stat-value">{{ customer_count }}</div><div class="stat-foot"><span class="stat-note">Registered customers</span><i class="bi bi-arrow-up-right"></i></div></a>
+  <a class="stat-card stat-orange" href="{{ url_for('sales_history') }}"><div class="stat-top"><span>Transactions</span><span class="stat-icon"><i class="bi bi-receipt"></i></span></div><div class="stat-value">{{ sales_count }}</div><div class="stat-foot"><span class="stat-note">Sales bills created</span><i class="bi bi-arrow-up-right"></i></div></a>
+</div>
+<div class="content-grid charts-grid">
+  <section class="panel sales-panel"><div class="panel-heading"><div><h2>Sales overview</h2><p>Monthly revenue from recorded sales</p></div><div class="chart-select-wrap"><i class="bi bi-graph-up-arrow"></i><select id="chartType" aria-label="Chart type"><option value="line">Line chart</option><option value="bar">Bar chart</option></select></div></div>
+    {% if monthly %}<div class="chart-wrap"><canvas id="salesChart" aria-label="Monthly sales chart"></canvas></div>{% else %}<div class="empty-chart"><span><i class="bi bi-bar-chart-line"></i></span><strong>Your sales chart will appear here</strong><p>Record your first sale to start tracking revenue.</p><a class="btn btn-primary btn-sm" href="{{ url_for('sales') }}">Record a sale</a></div>{% endif %}
+  </section>
+  <section class="panel quick-panel"><div class="panel-heading"><div><h2>Quick actions</h2><p>Jump straight into a task</p></div><span class="heading-icon"><i class="bi bi-lightning-charge-fill"></i></span></div>
+    <div class="quick-grid"><a class="quick-action qa-blue" href="{{ url_for('products') }}"><span><i class="bi bi-plus-lg"></i></span><strong>Add product</strong><small>Update your catalogue</small></a><a class="quick-action qa-green" href="{{ url_for('customers') }}"><span><i class="bi bi-person-plus"></i></span><strong>Add customer</strong><small>Grow your customer list</small></a><a class="quick-action qa-purple" href="{{ url_for('sales') }}"><span><i class="bi bi-cart-check"></i></span><strong>Record sale</strong><small>Create a new bill</small></a><a class="quick-action qa-orange" href="{{ url_for('reports') }}"><span><i class="bi bi-file-earmark-bar-graph"></i></span><strong>View reports</strong><small>Explore business results</small></a></div>
+  </section>
+</div>
+<div class="content-grid lower-grid">
+  <section class="panel recent-panel"><div class="panel-heading"><div><h2>Recent sales</h2><p>Your latest transactions</p></div><a class="text-link" href="{{ url_for('sales_history') }}">View all <i class="bi bi-arrow-right"></i></a></div>
+    {% if recent_sales %}<div class="table-responsive"><table class="table dashboard-table"><thead><tr><th>Bill #</th><th>Customer</th><th>Date</th><th class="text-end">Total</th></tr></thead><tbody>{% for sale in recent_sales %}<tr><td><span class="bill-id">#{{ sale.id }}</span></td><td><span class="customer-cell"><span class="customer-avatar">{{ sale.customer[:1]|upper }}</span>{{ sale.customer }}</span></td><td>{{ sale.sale_date.strftime('%d %b %Y') if sale.sale_date else '—' }}</td><td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(sale.total_amount|float) }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><i class="bi bi-receipt"></i><strong>No sales yet</strong><p>Your recent bills will show up here.</p><a href="{{ url_for('sales') }}" class="text-link">Create your first sale <i class="bi bi-arrow-right"></i></a></div>{% endif %}
+  </section>
+  <section class="panel stock-panel"><div class="panel-heading"><div><h2>Stock watch</h2><p>Items with the lowest stock first</p></div><a class="heading-icon" href="{{ url_for('products') }}" title="Manage products"><i class="bi bi-box-seam"></i></a></div>
+    {% if stock_items %}<div class="stock-list">{% for item in stock_items %}<div class="stock-item"><div class="stock-item-top"><span class="stock-product"><span class="product-icon"><i class="bi bi-box"></i></span><span><strong>{{ item.name }}</strong><small>₹{{ '{:,.2f}'.format(item.price|float) }} each</small></span></span><span class="stock-count {% if item.stock <= 5 %}stock-low{% elif item.stock <= 10 %}stock-medium{% else %}stock-ok{% endif %}">{{ item.stock }} left</span></div><div class="stock-track"><span class="{% if item.stock <= 5 %}bar-low{% elif item.stock <= 10 %}bar-medium{% else %}bar-ok{% endif %}" style="width: {{ [((item.stock / 50) * 100), 100]|min }}%"></span></div></div>{% endfor %}</div><a class="stock-link" href="{{ url_for('products') }}">Manage inventory <i class="bi bi-arrow-right"></i></a>{% else %}<div class="empty-state"><i class="bi bi-box-seam"></i><strong>No products added</strong><p>Add products to start monitoring stock.</p><a href="{{ url_for('products') }}" class="text-link">Add a product <i class="bi bi-arrow-right"></i></a></div>{% endif %}
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const dateEl = document.getElementById('todayDate');
+  if (dateEl) dateEl.textContent = new Intl.DateTimeFormat('en-IN', {day:'numeric', month:'short', year:'numeric'}).format(new Date());
+  const chartCanvas = document.getElementById('salesChart');
+  if (chartCanvas) {
+    const labels = {{ monthly|map(attribute='month')|list|tojson }};
+    const values = {{ monthly|map(attribute='total')|list|tojson }}.map(Number);
+    const chartContext = chartCanvas.getContext('2d');
+    let salesChart;
+    function buildChart(type) {
+      if (salesChart) salesChart.destroy();
+      salesChart = new Chart(chartContext, {
+        type,
+        data: {labels, datasets: [{label:'Sales (₹)', data:values, borderColor:'#3478f6', backgroundColor:type === 'line' ? 'rgba(52,120,246,.12)' : 'rgba(52,120,246,.78)', borderWidth:2.5, fill:type === 'line', tension:.35, pointRadius:4, pointHoverRadius:7, borderRadius:type === 'bar' ? 7 : 0}]},
+        options: {responsive:true, maintainAspectRatio:false, interaction:{intersect:false, mode:'index'}, plugins:{legend:{display:false}, tooltip:{callbacks:{label:(context) => ' ₹' + Number(context.raw).toLocaleString('en-IN',{minimumFractionDigits:2})}}}, scales:{x:{grid:{display:false}, ticks:{color:'#7a879b'}}, y:{beginAtZero:true, grid:{color:'#edf1f7'}, ticks:{color:'#7a879b', callback:(value)=>'₹'+Number(value).toLocaleString('en-IN')}}}}
+      });
+    }
+    buildChart('line');
+    document.getElementById('chartType').addEventListener('change', event => buildChart(event.target.value));
+  }
+</script>
+{% endblock %}
